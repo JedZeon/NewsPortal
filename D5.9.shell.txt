@@ -3,23 +3,21 @@ from django.contrib.auth.models import User
 
 User.objects.create(username='user1') 
 u1 = User.objects.all()[0]
-a1 = Author(user=u1) 
-a1.save()                                                                                             
-
 u2 = User.objects.create_user('user2')
-Author.objects.create(user=u2)
+
+a1 = Author.objects.create(user=u1)
+a2 = Author.objects.create(user=u2)
 
 
 Category.objects.create(name='sport')
 Category.objects.create(name='policy')
 Category.objects.create(name='education')
-Category.objects.create(name='economy')
 Category.objects.create(name='zdrav')
 
 
-p1 = Post.objects.create(author=a1, title='Вакцинация от грипа', text='Поступили вакцины от гриппа А') 
-p2 = Post.objects.create(author=a1, title='ЗОЖ', text='Занимайтесь спортомб живите полной жизнью. Даже если жизнь бьёт ключем помните она иногда промазывает. 1231213213213213213213213 321 321 321 32 132 13 21 321 321 321 321 321 321 321 21 3251 321 32 123 ')
-Post.objects.create(author_id=1)
+Post.objects.create(author=a1, type_news='NE' , title='Вакцинация от грипа', text='Поступили вакцины от гриппа А') 
+Post.objects.create(author=a1, type_news='AR', title='ЗОЖ', text='Занимайтесь спортомб живите полной жизнью. Даже если жизнь бьёт ключем помните она иногда промазывает. 1231213213213213213213213 321 321 321 32 132 13 21 321 321 321 321 321 321 321 21 3251 321 32 123 ')
+Post.objects.create(author=a1, type_news='AR')
 
 
 PostCategory.objects.create(post_id=1, category_id=1)
@@ -31,6 +29,8 @@ PostCategory.objects.create(post_id=1, category_id=2)
 Comment.objects.create(post_id=1, user_id=1, text='Класс')
 Comment.objects.create(post_id=1, user_id=1, text='Жуть')  
 Comment.objects.create(post_id=2, user_id=1, text='ЗОЖ - рулит') 
+Comment.objects.create(post_id=2, user_id=1, text='ЗОЖ - форева') 
+Comment.objects.create(post_id=3, user_id=1, text='Пустовато') 
 
 
 post = Post.objects.get(pk=1)
@@ -39,13 +39,60 @@ post.like()
 post.dislike()
 post.rate
 
+post = Post.objects.get(pk=2)
+post.like()
+post.like()
+post.dislike()
+post.like()
+post.like()
+post.rate
+
+post = Post.objects.get(pk=3)
+post.dislike()
+post.dislike()
+post.dislike()
+post.dislike()
+post.dislike()
+
 
 com = Comment.objects.get(pk=1)
 com.like()
 com.like()
 com.dislike()
 com.rate
+com = Comment.objects.get(pk=2)
+com.like()
+com.like()
+com.like()
+com.like()
+com.rate
+com = Comment.objects.get(pk=3)
+com.like()
+com.like()
+com.dislike()
+com.rate
+com = Comment.objects.get(pk=4)
+com.dislike()
+com.dislike()
+com.dislike()
+com.rate
 
 
 a1.update_rating()
 a1.rate
+a2.update_rating()
+a2.rate
+
+best_author = Author.objects.order_by('-rate').values('rate','user').first()
+best_name_user =  User.objects.get(id=best_author['user']).username
+{'username': best_name_user,'рейтинг лучшего пользователя': best_author['rate']}
+
+best_news = Post.objects.order_by('-rate').first()
+{'дата добавления':best_news.date_time.strftime("%d-%m-%Y"),'username автора':best_news.author.user.username,'рейтинг':best_news.rate,'заголовок':best_news.title,'превью':best_news.preview()}
+
+
+comments = Comment.objects.filter(post=best_news) 
+for c in comments:
+	{'дата':c.date_time.strftime("%d-%m-%Y"),'пользователь': c.post.author.user.username, 'рейтинг': c.rate, 'текст': c.text}
+
+
