@@ -1,0 +1,51 @@
+from news.models import Author, Category, Post, PostCategory, Comment
+from django.contrib.auth.models import User
+
+User.objects.create(username='user1') 
+u1 = User.objects.all()[0]
+a1 = Author(user=u1) 
+a1.save()                                                                                             
+
+u2 = User.objects.create_user('user2')
+Author.objects.create(user=u2)
+
+
+Category.objects.create(name='sport')
+Category.objects.create(name='policy')
+Category.objects.create(name='education')
+Category.objects.create(name='economy')
+Category.objects.create(name='zdrav')
+
+
+p1 = Post.objects.create(author=a1, title='Вакцинация от грипа', text='Поступили вакцины от гриппа А') 
+p2 = Post.objects.create(author=a1, title='ЗОЖ', text='Занимайтесь спортомб живите полной жизнью. Даже если жизнь бьёт ключем помните она иногда промазывает. 1231213213213213213213213 321 321 321 32 132 13 21 321 321 321 321 321 321 321 21 3251 321 32 123 ')
+Post.objects.create(author_id=1)
+
+
+PostCategory.objects.create(post_id=1, category_id=1)
+PostCategory.objects.create(post_id=2, category_id=2)
+PostCategory.objects.create(post_id=3, category_id=3)
+PostCategory.objects.create(post_id=1, category_id=2)
+
+
+Comment.objects.create(post_id=1, user_id=1, text='Класс')
+Comment.objects.create(post_id=1, user_id=1, text='Жуть')  
+Comment.objects.create(post_id=2, user_id=1, text='ЗОЖ - рулит') 
+
+
+post = Post.objects.get(pk=1)
+post.like()
+post.like()
+post.dislike()
+post.rate
+
+
+com = Comment.objects.get(pk=1)
+com.like()
+com.like()
+com.dislike()
+com.rate
+
+
+a1.update_rating()
+a1.rate
