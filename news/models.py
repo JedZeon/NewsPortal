@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum
 
-
 sport = 'SP'
 education = 'ED'
 policy = 'PO'
@@ -28,18 +27,17 @@ TYPES = [
 
 class Author(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    rate = models.IntegerField(default=0) # рейтинг автора
+    rate = models.IntegerField(default=0)  # рейтинг автора
 
     def update_rating(self):
-        articles_rate = Post.objects.filter(author_id=self.pk).aggregate(Sum('rate'))['rate__sum']*3
+        articles_rate = Post.objects.filter(author_id=self.pk).aggregate(Sum('rate'))['rate__sum'] * 3
         comment_rate = Comment.objects.filter(user_id=self.user).aggregate(Sum('rate'))['rate__sum']
         comments_posts_rate = Comment.objects.filter(post__author__user=self.user).aggregate(Sum('rate'))['rate__sum']
 
-        self.rate = articles_rate+comment_rate+comments_posts_rate
+        self.rate = articles_rate + comment_rate + comments_posts_rate
         self.save()
 
         return self.rate
-
 
 
 class Category(models.Model):
@@ -54,6 +52,9 @@ class Post(models.Model):
     title = models.CharField(max_length=255)
     text = models.TextField()
     rate = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f'{self.date_time.strftime("%d.%m.%Y")}: {self.title.title()} - {self.text[:20]}'
 
     def preview(self):
         t_ = self.text[0:124]

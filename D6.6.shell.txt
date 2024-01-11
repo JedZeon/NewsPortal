@@ -1,0 +1,6 @@
+from news.models import Author, Category, Post, PostCategory, Comment
+from django.contrib.auth.models import User
+
+a2 = User.objects.all()[1]
+
+Post.objects.create(author=a2, type_news='AR' , title='Нехороший человек — редиска!', text='редиска, \n редиска, \n редиска, \n редиска, \n редиска, \n редиска, \n редиска, \n редиска, \n редиска, \n редиска, \n редиска, \n редиска, \n редиска, \n редиска, \n редиска, \n редиска, \n редиска, \n редиска, \n')
