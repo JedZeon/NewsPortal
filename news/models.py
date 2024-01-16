@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum
+from django.urls import reverse
 
 sport = 'SP'
 education = 'ED'
@@ -39,6 +40,9 @@ class Author(models.Model):
 
         return self.rate
 
+    def __str__(self):
+        return f'{self.user}'
+
 
 class Category(models.Model):
     name = models.CharField(max_length=2, choices=TOPICS, default=zdrav, unique=True)
@@ -68,6 +72,9 @@ class Post(models.Model):
         self.rate -= 1
         self.save()
 
+    def get_absolute_url(self):
+        return reverse('post_detail', args=[str(self.id)])
+
 
 class PostCategory(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
@@ -88,3 +95,4 @@ class Comment(models.Model):
     def dislike(self):
         self.rate -= 1
         self.save()
+

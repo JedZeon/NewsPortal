@@ -1,14 +1,15 @@
-<!--  наследуемся от шаблона default.html, который мы создавали для flatpages -->
 {% extends 'flatpages/default.html' %}
 
 {% load custom_filters %}
+{% load custom_tags %}
 
 {% block title %}
 Posts
 {% endblock title %}
 
 {% block content %}
-<h1>Все публикации: {{ post_list|length }}</h1>
+<h1>Публикации: </h1>
+
    <hr>
    {% if post_list %}
        <table>
@@ -28,7 +29,34 @@ Posts
 
        </table>
    {% else %}
-       <h2>Товаров нет!</h2>
+       <h2>Публикаций нет!</h2>
    {% endif %}
+
+    {# Добавляем пагинацию на страницу #}
+
+    {# Переход к 1 странице #}
+    <a href="?{% url_replace page=1 %}"> << </a>
+
+   {% if page_obj.has_previous %}
+       {# Для каждой ссылки пагинации указываем обработку через новый тег #}
+       <a href="?{% url_replace page=1 %}">1</a>
+       {% if page_obj.previous_page_number != 1 %}
+           ...
+           <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+       {% endif %}
+   {% endif %}
+
+   {{ page_obj.number }}
+
+   {% if page_obj.has_next %}
+       <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+       {% if paginator.num_pages != page_obj.next_page_number %}
+           ...
+           <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+       {% endif %}
+   {% endif %}
+
+    {# Переход к последней странице #}
+    <a href="?{% url_replace page=page_obj.paginator.num_pages %}"> >> </a>
 
 {% endblock content %}
