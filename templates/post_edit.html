@@ -7,5 +7,8 @@
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Save" />
+<!--    {% if is_not_authors %}-->
+<!--    <a class="button" href="{{post.id}}/delete/">Войти</a>-->
+<!--    {% endif %}-->
 </form>
 {% endblock content %}

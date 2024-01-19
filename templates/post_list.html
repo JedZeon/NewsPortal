@@ -21,7 +21,7 @@ Posts
 
            {% for post in post_list %}
            <tr>
-               <td>{{ post.title|censor }}</td>
+               <td><a href="/news/{{post.id}}"> {{ post.title|censor }} </a></td>
                <td>{{ post.date_time|date:'d M Y' }}</td>
                <td>{{ post.text|truncatechars:20|censor }}</td>
            </tr>

@@ -1,0 +1,2 @@
+Подключение allauth , авторизация
+pip install django-allauth

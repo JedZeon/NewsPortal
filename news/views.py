@@ -3,6 +3,7 @@ from .models import Post
 from .filters import PostFilter
 from .forms import PostForm
 from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 
 class PostList(ListView):
@@ -21,6 +22,7 @@ class PostList(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['filterset'] = self.filterset
+        context['is_not_authors'] = not self.request.user.groups.filter(name='authors').exists()
         return context
 
 
@@ -36,30 +38,28 @@ class PostSearch(PostList):
     template_name = 'search.html'
 
 
-class PostCreate(CreateView):
+class PostCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
+    permission_required = ('posts.add_post',)
+
     form_class = PostForm
     model = Post
     template_name = 'post_edit.html'
     initial = {'type_news': 'NE'}
-
-    # def form_valid(self, form):
-    #     post = form.save(commit=False)
-    #     post.type_news = 'AR' if 'articles' in self.request.path else 'NE'
-    #     post.save()
-    #     return super().form_valid(form)
 
 
 class ArticleCreate(PostCreate):
     initial = {'type_news': 'AR'}
 
 
-class PostUpdate(UpdateView):
+class PostUpdate(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+    permission_required = ('posts.update_post',)
+
     form_class = PostForm
     model = Post
     template_name = 'post_edit.html'
 
 
-class PostDelete(DeleteView):
+class PostDelete(LoginRequiredMixin, DeleteView):
     model = Post
     template_name = 'post_delete.html'
     success_url = reverse_lazy('post_list')
