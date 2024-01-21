@@ -1,2 +1,13 @@
+Создаём виртуальное окружение:
+python -m venv venv
+
+Заходим в него:
+venv\scripts\activate
+
+Устанавливаем Django в свежее виртуальное окружение:
+pip install django
+
+pip install django-filter
+
 Подключение allauth , авторизация
-pip install django-allauth
+pip install django-allauth==0.54.0

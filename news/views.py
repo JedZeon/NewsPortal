@@ -1,4 +1,4 @@
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from .models import Post
 from .filters import PostFilter
 from .forms import PostForm
@@ -38,8 +38,8 @@ class PostSearch(PostList):
     template_name = 'search.html'
 
 
-class PostCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
-    permission_required = ('posts.add_post',)
+class PostCreate(PermissionRequiredMixin, CreateView):
+    permission_required = ('news.add_post',)
 
     form_class = PostForm
     model = Post
@@ -51,8 +51,8 @@ class ArticleCreate(PostCreate):
     initial = {'type_news': 'AR'}
 
 
-class PostUpdate(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
-    permission_required = ('posts.update_post',)
+class PostUpdate(PermissionRequiredMixin, UpdateView):
+    permission_required = ('news.change_post',)
 
     form_class = PostForm
     model = Post
@@ -63,3 +63,5 @@ class PostDelete(LoginRequiredMixin, DeleteView):
     model = Post
     template_name = 'post_delete.html'
     success_url = reverse_lazy('post_list')
+
+

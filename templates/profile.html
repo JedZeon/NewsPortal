@@ -1,0 +1,26 @@
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+
+{% block title %}
+    Profile
+{% endblock title %}
+
+{% block content %}
+    <h2>Страница пользователя {{ request.user.username }}</h2>
+
+    <h6>Имя: {{ request.user.first_name }}</h6>
+    <h6>Фамилия: {{ request.user.last_name }}</h6>
+    <h6>E-mail: {{ request.user.email }}</h6>
+    
+    
+
+    <div class="header">
+        <hr>
+        {% if is_not_authors %}
+            <a class="btn-getstarted" href="{% url 'upgrade' %}"> Стать автором</a>
+        {% endif %}
+        <a class="btn-getstarted" href="/profile/{{ user.id }}/edit/">Изменить</a>
+        <a class="btn-getstarted" href="/accounts/logout/">Выйти</a>
+    </div>
+{% endblock %}

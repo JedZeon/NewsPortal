@@ -3,10 +3,13 @@
 {% load custom_filters %}
 
 {% block title %}
-Post
+    Post
 {% endblock title %}
 
 {% block content %}
-<h1>{{ post.title|censor }} ({{ post.date_time|date:'d.M.Y' }})</h1>
-<h3>{{ post.text|censor }}</h3>
+    <h1>{{ post.title|censor }} ({{ post.date_time|date:'d.M.Y' }})</h1>
+    <h3>{{ post.text|censor }}</h3>
+
+    <a class="button" href="{{ post.id }}/edit/">Изменить</a>
+    <a class="button" href="{{ post.id }}/delete/">Удалить</a>
 {% endblock content %}
