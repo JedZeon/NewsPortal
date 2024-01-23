@@ -25,8 +25,12 @@ class BaseRegisterView(LoginRequiredMixin, CreateView):
     success_url = '/'
 
 
-class ProfileView(LoginRequiredMixin, TemplateView):
+# class ProfileView(LoginRequiredMixin, TemplateView):
+class ProfileView(LoginRequiredMixin, DetailView):
+
+    model = User
     template_name = 'profile.html'
+    context_object_name = 'profile'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

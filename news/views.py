@@ -1,3 +1,4 @@
+import requests
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from .models import Post
 from .filters import PostFilter
@@ -16,12 +17,19 @@ class PostList(ListView):
     # Переопределяем функцию получения списка товаров
     def get_queryset(self):
         queryset = super().get_queryset()
+        # Используем наш класс фильтрации.
+        # self.request.GET содержит объект QueryDict(параметры запроса(фильтрации)), который мы рассматривали
+        # в этом юните ранее.
+        # Сохраняем нашу фильтрацию в объекте класса,
+        # чтобы потом добавить в контекст и использовать в шаблоне.
         self.filterset = PostFilter(self.request.GET, queryset)
         return self.filterset.qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # Добавляем в контекст объект фильтрации.
         context['filterset'] = self.filterset
+        # context['filterset'] = self.filterset
         context['is_not_authors'] = not self.request.user.groups.filter(name='authors').exists()
         return context
 
@@ -63,5 +71,3 @@ class PostDelete(LoginRequiredMixin, DeleteView):
     model = Post
     template_name = 'post_delete.html'
     success_url = reverse_lazy('post_list')
-
-

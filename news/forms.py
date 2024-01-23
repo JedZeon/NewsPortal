@@ -13,6 +13,7 @@ class PostForm(forms.ModelForm):
             'text',
             'author',
             'type_news',
+            'categories',
         ]
 
     # дополнительные свои контроли полей формы

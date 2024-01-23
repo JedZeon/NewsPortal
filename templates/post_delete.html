@@ -6,6 +6,8 @@
 <form action="" method="post">
     {% csrf_token %}
     <p>Удаляем "{{ object }}"?</p>
-    <input type="submit" value="Delete" />
+    <button type="submit" class="btn btn-danger">
+        Удалить
+    </button>
 </form>
 {% endblock content %}

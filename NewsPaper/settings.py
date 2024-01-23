@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     # доп способ авторизации
     'allauth.socialaccount.providers.google',
+
+    'widget_tweaks',
 ]
 
 LOGIN_URL = '/accounts/login/'

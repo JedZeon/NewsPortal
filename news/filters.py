@@ -1,6 +1,6 @@
 from django.forms import TextInput, Select, DateInput
 from django_filters import FilterSet, CharFilter, ModelChoiceFilter, DateFilter
-from .models import Post, TYPES, Author
+from .models import Post, TYPES, Author, Category
 
 
 class PostFilter(FilterSet):
@@ -10,6 +10,13 @@ class PostFilter(FilterSet):
     #     empty_label='любой',
     #     widget=Select(attrs={'class': 'form-control'})
     # )
+
+    categories = ModelChoiceFilter(
+        label='Категория',
+        empty_label='без категории',
+        queryset=Category.objects.all(),
+        widget=Select(attrs={'class': 'form-control'})
+    )
 
     date_time = DateFilter(
         lookup_expr='date__gte',
@@ -41,5 +48,6 @@ class PostFilter(FilterSet):
             'title',
             'author',
             'date_time',
+            'categories',
             # 'type_news'
         ]

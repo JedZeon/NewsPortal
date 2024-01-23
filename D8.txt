@@ -11,3 +11,19 @@ pip install django-filter
 
 Подключение allauth , авторизация
 pip install django-allauth==0.54.0
+
+
+Настройка форм с помощью
+django-widget-tweaks
+добавить в INSTALLED_APPS
+'widget_tweaks',
+
+{% load widget_tweaks %} в верхней части вашей HTML-страницы
+Название каждого поля описано в коде “// ”. В файле CSS у нас будет весь наш код для настройки каждого поля по классу или идентификатору.
+<div class="form-group">
+  // first_name is the name by which first name is created in django forms
+  {% render_field form.first_name class="form-control" placeholder="First Name" type="text" %}
+</div>
+<div>
+  <button type="submit" value="Submit" > Register </button>
+</div>

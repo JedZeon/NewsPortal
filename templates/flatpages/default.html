@@ -1,101 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="ru">
 <head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
     <title>Новости</title>
-
     {% load static %}
-
-    <meta content="" name="description">
-    <meta content="" name="keywords">
-
-    <!-- Favicons -->
-    <link href='{% static "assets/img/favicon.png" %}' rel="icon">
-    <link href='{% static "assets/img/apple-touch-icon.png" %}' rel="apple-touch-icon">
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&display=swap"
-          rel="stylesheet">
-
-    <!-- Vendor CSS Files -->
-    <link href='{% static "assets/vendor/bootstrap/css/bootstrap.min.css" %}' rel="stylesheet">
-    <link href='{% static "assets/vendor/bootstrap-icons/bootstrap-icons.css" %}' rel="stylesheet">
-    <link href='{% static "assets/vendor/aos/aos.css" %}' rel="stylesheet">
-    <link href='{% static "assets/vendor/glightbox/css/glightbox.min.css" %}' rel="stylesheet">
-    <link href='{% static "assets/vendor/swiper/swiper-bundle.min.css" %}' rel="stylesheet">
-
-    <!-- Variables CSS Files. Uncomment your preferred color scheme -->
-    <link href='{% static "assets/css/variables.css" %}' rel="stylesheet">
-
-    <!-- Template Main CSS File -->
-    <link href='{% static "assets/css/main.css" %}' rel="stylesheet">
-
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}"/>
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet"/>
 </head>
 <body>
-
-<!-- ======= Header ======= -->
-<header id="header" class="header fixed-top" data-scrollto-offset="0">
-    <div class="container-fluid d-flex align-items-center justify-content-between">
-
-        <a href="/news/" class="logo d-flex align-items-center scrollto me-auto me-lg-0">
-            <img src='{% static "assets/img/logo.png" %}' alt="">
-            <h1>Новостной портал<span>.</span></h1>
-        </a>
-
-        <nav id="navbar" class="navbar">
-            <ul>
-                <li><a class="nav-link scrollto" href="/">Главная</a></li>
-                <li class="dropdown"><a href="/news/"><span>Новости</span> <i class="bi bi-chevron-down dropdown-indicator"></i></a>
-                    <ul>
-                        <li><a href="/news/create/" >Добавить новость</a></li>
-                        <li><a href="/articles/create/">Добавить статью</a></li>
+<!-- Responsive navbar-->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">Новостной портал</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span
+                class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="/news/">Главная</a></li>
+                <li class="nav-item"><a class="nav-link" href="/news/search/">Поиск...</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="/news/" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">Новости</a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="/news/create/">Добавить новость</a></li>
+                        <li><a class="dropdown-item" href="/articles/create/">Добавить статью</a></li>
+                        <!--                        <li>-->
+                        <!--                            <hr class="dropdown-divider"/>-->
+                        <!--                        </li>-->
+                        <!--                        <li><a class="dropdown-item" href="#">Something else here</a></li>-->
                     </ul>
                 </li>
-                <li><a class="nav-link scrollto" href="/news/search/">Поиск...</a></li>
-                <li><a class="nav-link scrollto" href="/about/">О нас</a></li>
-
+                <li class="nav-item"><a class="nav-link" href="/about/">О нас</a></li>
                 {% if user.is_authenticated %}
-                <li class="dropdown scrollto"><a href="#"><span> {{user.username}} </span> <i
-                        class="bi bi-chevron-down dropdown-indicator"></i></a>
-                    <ul>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false"><span> {{user.username}} </span></a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                         {% if is_not_authors %}
-                        <li><a href="/sign/upgrade/">Хочу стать автором</a></li>
-                        <li> <hr>  </li>
+                        <li><a class="dropdown-item" href="/sign/upgrade/">Хочу стать автором</a></li>
                         {% endif %}
-                        <li><a href="/profile/{{ user.id }}" >Профиль</a></li>
-                        <li> <hr>  </li>
-                        <li><a href="/accounts/logout/">Выход</a></li>
+                        <li><a class="dropdown-item" href="/profile/{{ user.id }}">Профиль</a></li>
+                        <li>
+                            <hr class="dropdown-divider"/>
+                        </li>
+                        <li><a class="dropdown-item" href="/accounts/logout/">Выйти</a></li>
                     </ul>
                 </li>
                 {% else %}
-                <li><a class="nav-link scrollto" href="/accounts/login/">Войти</a></li>
+                <li class="nav-item"><a class="nav-link" href="/accounts/login/">Войти</a></li>
                 {% endif %}
             </ul>
-            <i class="bi bi-list mobile-nav-toggle d-none"></i>
-        </nav><!-- .navbar -->
-    <hr>
-    </div>
-</header><!-- End Header -->
-<main id="main">
-    <section class="inner-page">
-        <!-- Page content-->
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12 text-center">
-                    <hr>
-                    {% block content %}
-                    {{ flatpage.content }}
-                    {% endblock content %}
-                </div>
-            </div>
         </div>
-    </section><!-- End About Section -->
-</main><!-- End #main -->
+    </div>
+</nav>
+<!-- Page content-->
+<div class="container">
+    <div class="text-center mt-5">
+        {% block content %}
+        {{ flatpage.content }}
+        {% endblock content %}
 
+        <!--        <p class="lead">A complete project boilerplate built with Bootstrap</p>-->
+        <!--        <p>Bootstrap v5.2.3</p>-->
+    </div>
+</div>
+<script src="{% static 'js/scripts.js' %}"></script>
 </body>
 </html>

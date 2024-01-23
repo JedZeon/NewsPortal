@@ -5,7 +5,7 @@ from sign.views import ProfileView, ProfileEdit
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('pages/', include('django.contrib.flatpages.urls')),
-    path('', include('news.urls')),
+    path('', include('news.urls'), name='home'),
     path('sign/', include('sign.urls')),
     path('accounts/', include('allauth.urls')),
     path('profile/<int:pk>/', ProfileView.as_view(), name='profile'),
