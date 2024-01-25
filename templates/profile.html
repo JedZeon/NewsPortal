@@ -19,8 +19,12 @@ Profile
 
         </td>
         <td align="left">
-            <p>Количество постов:</p>
-            <p>Рейтинг статей:</p>
+            <p>Количество постов: {{ sum_post }}</p>
+            <p>Рейтинг статей: {{ rate }}</p>
+            <hr>
+            <p>Лучшая статья: <small>рейтинг ({{ best_news.rate }})</small></p>
+            <h6>{{ best_news }} : {{ best_news.title }}</h6>
+            <a>{{ best_news_preview }}</a>
         </td>
     </tr>
 </table>
@@ -28,12 +32,12 @@ Profile
     {% if object == user %}
     <hr>
     {% if is_not_authors %}
-    <a class="btn btn-success" href="{% url 'upgrade' %}"> Стать автором</a>
+    <a class="btn btn-light" href="{% url 'upgrade' %}"> Стать автором</a>
     {% endif %}
-    <a class="btn btn-success" href="/profile/{{ user.id }}/edit/">Изменить</a>
-    <a class="btn btn-info" href="/accounts/logout/">Выйти</a>
+    <a class="btn btn-light" href="/profile/{{ user.id }}/edit/">Изменить</a>
+    <a class="btn btn-light" href="/accounts/logout/">Выйти</a>
 
     {% endif %}
-    <a class="btn btn-info" href="{{request.META.HTTP_REFERER}}">Назад</a>
+    <a class="btn btn-light" href="{{request.META.HTTP_REFERER}}">Назад</a>
 </div>
 {% endblock %}

@@ -1,5 +1,7 @@
 from django import template
 
+from news.models import Category
+
 register = template.Library()
 
 
@@ -23,3 +25,8 @@ def censor(value):
         value = value.replace(f'{bad[:1].lower()}{bad[1:]}', f'{bad[:1].lower()}{"*" * (len(bad) - 1)}')
 
     return value
+
+
+@register.filter()
+def get_category(category_id):
+    return Category.objects.get(id=category_id).name

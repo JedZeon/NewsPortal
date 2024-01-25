@@ -1,10 +1,13 @@
-import requests
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
-from .models import Post
+# import requests
+from django.contrib.auth.models import User
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+# , TemplateView
+from .models import Post, Category, UserCategory
 from .filters import PostFilter
 from .forms import PostForm
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.shortcuts import redirect
 
 
 class PostList(ListView):
@@ -12,14 +15,13 @@ class PostList(ListView):
     ordering = '-date_time'
     template_name = 'post_list.html'
     context_object_name = 'post_list'
-    paginate_by = 10
+    paginate_by = 5
 
     # Переопределяем функцию получения списка товаров
     def get_queryset(self):
         queryset = super().get_queryset()
         # Используем наш класс фильтрации.
-        # self.request.GET содержит объект QueryDict(параметры запроса(фильтрации)), который мы рассматривали
-        # в этом юните ранее.
+        # self.request.GET содержит объект QueryDict(параметры запроса(фильтрации))
         # Сохраняем нашу фильтрацию в объекте класса,
         # чтобы потом добавить в контекст и использовать в шаблоне.
         self.filterset = PostFilter(self.request.GET, queryset)
@@ -29,7 +31,6 @@ class PostList(ListView):
         context = super().get_context_data(**kwargs)
         # Добавляем в контекст объект фильтрации.
         context['filterset'] = self.filterset
-        # context['filterset'] = self.filterset
         context['is_not_authors'] = not self.request.user.groups.filter(name='authors').exists()
         return context
 
@@ -71,3 +72,29 @@ class PostDelete(LoginRequiredMixin, DeleteView):
     model = Post
     template_name = 'post_delete.html'
     success_url = reverse_lazy('post_list')
+
+
+class CategoryList(LoginRequiredMixin, ListView):
+    model = Category
+    ordering = 'id'
+    template_name = 'category_list.html'
+    context_object_name = 'category_list'
+    paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        sub = []
+        for cat_user in UserCategory.objects.all().filter(user=self.request.user):
+            sub.append(cat_user.category)
+
+        context['user_subscriber'] = sub
+        return context
+
+    def subscribe_user(request, pk, **kwargs):
+        UserCategory.objects.create(user=request.user, category=Category.objects.get(id=pk))
+        return redirect('/category/')
+
+    def unsubscribe_user(request, pk, **kwargs):
+        cat = UserCategory.objects.get(user=request.user, category=Category.objects.get(id=pk))
+        cat.delete()
+        return redirect('/category/')

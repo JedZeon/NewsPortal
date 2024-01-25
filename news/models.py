@@ -31,14 +31,18 @@ class Author(models.Model):
     rate = models.IntegerField(default=0)  # рейтинг автора
 
     def update_rating(self):
-        articles_rate = Post.objects.filter(author_id=self.pk).aggregate(Sum('rate'))['rate__sum'] * 3
-        comment_rate = Comment.objects.filter(user_id=self.user).aggregate(Sum('rate'))['rate__sum']
-        comments_posts_rate = Comment.objects.filter(post__author__user=self.user).aggregate(Sum('rate'))['rate__sum']
+        articles_rate = int((Post.objects.filter(author_id=self.pk).aggregate(Sum('rate'))['rate__sum'] * 3) or 0)
+        comment_rate = int(Comment.objects.filter(user_id=self.user).aggregate(Sum('rate'))['rate__sum'] or 0)
+        comments_posts_rate = int(
+            Comment.objects.filter(post__author__user=self.user).aggregate(Sum('rate'))['rate__sum'] or 0)
 
         self.rate = articles_rate + comment_rate + comments_posts_rate
         self.save()
 
         return self.rate
+
+    def update_sum_post(self):
+        return Post.objects.filter(author=self).count()
 
     def __str__(self):
         return f'{self.user}'
@@ -46,9 +50,15 @@ class Author(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=2, choices=TOPICS, default=zdrav, unique=True)
+    subscribers = models.ManyToManyField(User, through='UserCategory')
 
     def __str__(self):
         return f'{self.name}'
+
+
+class UserCategory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
 
 class Post(models.Model):

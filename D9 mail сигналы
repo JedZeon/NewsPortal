@@ -1,0 +1,68 @@
+ПОЧТА
+настройка в settings.py
+EMAIL_HOST = 'smtp.mail.ru'
+EMAIL_PORT = 2525
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER = 'your@mail.ru'
+EMAIL_HOST_PASSWORD = 'app_password'
+
+Пароль для приложения
+Перейдите в настройки Mail ID → «Безопасность» → «Пароли для внешних приложений».
+
+from django.core.mail import mail_managers, send_mail
+mail_managers - менеджер почты
+
+# отправляем письмо
+        send_mail(
+            subject=f'{appointment.client_name} {appointment.date.strftime("%Y-%M-%d")}',  # имя клиента и дата записи будут в теме для удобства
+            message=appointment.message,  # сообщение с кратким описанием проблемы
+            from_email='peterbadson@yandex.ru', # здесь указываете почту, с которой будете отправлять (об этом попозже)
+            recipient_list=[]  # здесь список получателей. Например, секретарь, сам врач и т. д.
+        )
+
+
+
+СИГНАЛЫ
+
+в отдельный файл signals.py
+и подключить его в news/app.py
+//*****
+from django.apps import AppConfig
+
+
+class AppointmentConfig(AppConfig):
+    name = 'appointment'
+
+    # нам надо переопределить метод ready, чтобы при готовности нашего приложения импортировался модуль со всеми функциями обработчиками
+    def ready(self):
+        import appointment.signals
+//*****
+signals.py
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver # импортируем нужный декоратор
+from django.core.mail import mail_managers
+from .models import Appointment
+
+
+# в декоратор передаётся первым аргументом сигнал, на который будет реагировать эта функция, и в отправители надо передать также модель
+@receiver(post_save, sender=Appointment)
+def notify_managers_appointment(sender, instance, created, **kwargs):
+    if created:
+        subject = f'{instance.client_name} {instance.date.strftime("%d %m %Y")}'
+    else:
+        subject = f'Appointment changed for {instance.client_name} {instance.date.strftime("%d %m %Y")}'
+
+    mail_managers(
+        subject=subject,
+        message=instance.message,
+    )
+// ****
+
+--------------- Работает и так, странно как-то
+в INSTALLED_APPS
+надо указать не имя нашего приложения, а его конфиг, чтобы всё заработало
+'news.apps.NewsConfig',
+^^          ^^^
+app         название класса в news/apps.py

@@ -4,50 +4,46 @@
 {% load custom_tags %}
 
 {% block title %}
-Posts
+Category
 {% endblock title %}
 
 {% block content %}
-<h1>Публикации: </h1>
+<h1>Категории:</h1>
 
-{% if filterset.data.categories %}
-{% for cat in filterset.data.categories %}
-{{ cat|get_category }}
-{% endfor %}
-{% endif %}
+{% if category_list %}
 
-<hr>
-{% if post_list %}
 <table>
     <tr>
-        <td>Заголовок</td>
-        <td>Дата публикации</td>
-        <td>Краткое содержание</td>
+        <td></td>
+        <td></td>
+        <td></td>
     </tr>
 
-    {% for post in post_list %}
-
+    {% for cat in category_list %}
     <tr>
-        <td align="left"><a href="/news/{{post.id}}"> {{ post.title|censor }} </a></td>
-        <td>{{ post.date_time|date:'d M Y' }}</td>
-        <td align="left"> {{ post.text|truncatewords:20|censor }}</td>
-    </tr>
-    <tr>
-        <td colspan="3" align="right">
-            {% for category in post.categories.all %}
-            <a class="button" href="/news/?categories={{ category.id }}"><small> {{ category }} : </small></a>
-            {% endfor %}
-            <a href="/profile/{{post.author.user.id}}"><small>{{ post.author }} : </small></a>
+        <td width="5%">
+            <a class="btn">{{ cat.id }} </a>
             <hr>
         </td>
+        <td align="left" width="50%">
+            <a class="btn" href="/news/?categories={{ cat.id }}"> {{ cat }} </a>
+            <hr>
+        </td>
+        <td width="10%">
+            {% if cat in user_subscriber %}
+                <a class="btn" href="{{ cat.id }}/unsubscribe">✔</a>
+            {% else %}
+                <a class="btn" href="{{ cat.id }}/subscribe">Подписаться</a>
+            {% endif %}
+{#            <hr>#}
+        </td>
     </tr>
-
     {% endfor %}
-
 </table>
 {% else %}
-<h2>Публикаций нет!</h2>
+<h2>Категорий нет!</h2>
 {% endif %}
+
 
 {# Добавляем пагинацию на страницу #}
 
@@ -77,3 +73,4 @@ Posts
 <a href="?{% url_replace page=page_obj.paginator.num_pages %}"> >> </a>
 
 {% endblock content %}
+
