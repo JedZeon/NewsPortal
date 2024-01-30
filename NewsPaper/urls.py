@@ -10,4 +10,5 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('profile/<int:pk>/', ProfileView.as_view(), name='profile'),
     path('profile/<int:pk>/edit/', ProfileEdit.as_view(), name='profile_edit'),
+
 ]

@@ -1,37 +1,76 @@
-from django.core.mail import mail_managers, send_mail
-from .models import Post, Category, UserCategory
+from django.template.loader import render_to_string
 
-from django.db.models.signals import post_save
+from NewsPaper import settings
+from .models import Post, UserCategory, User
+
+from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
+from .functions import send_message_html
+
+from allauth.account.signals import email_confirmed
 
 
-# sender - от кого будит приходить сигнал
-# instance - данные записи
-# created - есть ли уже в базе (создание / редактирование)
-@receiver(post_save, sender=Post)
-def notify_user(sender, instance, created, **kwargs):
-    if created:
-        print(f'НОВОЕ - {instance}: {instance.date_time.strftime("%d/%m/%Y")}')
-        for post_category in instance.categories.all():
-            mail_user_send = []
-            print(post_category)
-            for category in UserCategory.objects.filter(category=post_category):
-                print(f'юзверь - {category.user}, категория {category.category}')
-                if category.user.email:
-                    mail_user_send.append(category.user.email)
+# Олег Афанасьев | ментор
+# Здравствуйте!
+# Из-за связи многие ко многим между постами и категориями, мы не можем при создании поста сразу назначить ему одну или
+# несколько категорий. Эта связь реализуется через идентификаторы поста и категории в промежуточной таблице.
+# Поэтому нужно предварительно создать пост, чтобы для него был сформирован идентификатор, по которому в дальнейшем
+# можно будет уже связать пост с категорией.
+# Поэтому при срабатывании сигнала post_save у поста еще не будет связанных категорий и ваше уведомление никому не
+# отправится.
+# В данном случае нужно использовать сигнал m2m_changed
 
-            print(mail_user_send)
-            if mail_user_send:
-                pass
-        # отправляем письмо
-        # send_mail(
-        #     subject=f'{instance.date_time.strftime("%Y-%M-%d")}: {instance.title}',
-        #     # имя клиента и дата записи будут в теме для удобства
-        #     message=instance.preview(),  # сообщение с кратким описанием проблемы
-        #     from_email='jedcrb@mail.ru',
-        #     # здесь указываете почту, с которой будете отправлять (об этом попозже)
-        #     recipient_list=mail_user_send,
-        #     # здесь список получателей. Например, секретарь, сам врач и т. д.
-        #     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!! для тестового сервера
-        #     fail_silently=True
-        # )
+
+# def post_save_m2m_changed(instance, action, pk, **kwargs):
+
+@receiver(signal=m2m_changed, sender=Post.categories.through)
+def post_save_m2m_changed(instance, action, **kwargs):
+    if action == 'post_add':
+        variant = 2
+
+        if variant == 2:
+            cat_user = UserCategory.objects.filter(category__in=instance.categories.all())
+
+            for cat in cat_user:
+                # Проверка есть ли емайл
+                if cat.user.email:
+                    # формируем html сообщения
+                    html_content = render_to_string(
+                        'message.html', {
+                            'post': instance,
+                            'username': cat.user,
+                            'link': f'{settings.SITE_URL}/news/{instance.pk}'
+                        }
+                    )
+                    send_message_html(to=[cat.user.email], subject=instance.title, html_message=html_content)
+
+        if variant == 1:
+            # Перебираем все категории поста
+            for post_category in instance.categories.all():
+                # перебираем пользователей подписаных на категорию
+                mail_user_send = []
+                for p_category in UserCategory.objects.filter(category=post_category):
+                    if p_category.user.email:
+                        # Чтобы не дублировать отправку запомним кому отправили
+                        if not (p_category.user.email in mail_user_send):
+                            mail_user_send.append(p_category.user.email)
+
+                            # формируем html сообщения
+                            html_content = render_to_string(
+                                'message.html', {
+                                    'post': instance,
+                                    'username': p_category.user,
+                                    'link': f'{settings.SITE_URL}/news/{pk}'
+                                }
+                            )
+
+                            send_message_html(to=[p_category.user.email], subject=instance.title,
+                                              html_message=html_content)
+                            # msg = EmailMultiAlternatives(
+                            #     subject=instance.title,
+                            #     # body=instance.text[0:50],
+                            #     from_email='jedcrb@mail.ru',
+                            #     to=[p_category.user.email]
+                            # )
+                            # msg.attach_alternative(html_content, "text/html")  # добавляем html
+                            # msg.send()  # отсылаем

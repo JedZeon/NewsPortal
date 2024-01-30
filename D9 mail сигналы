@@ -4,8 +4,8 @@ EMAIL_HOST = 'smtp.mail.ru'
 EMAIL_PORT = 2525
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
-EMAIL_HOST_USER = 'your@mail.ru'
-EMAIL_HOST_PASSWORD = 'app_password'
+EMAIL_HOST_USER = EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD
 
 Пароль для приложения
 Перейдите в настройки Mail ID → «Безопасность» → «Пароли для внешних приложений».
@@ -21,6 +21,21 @@ mail_managers - менеджер почты
             recipient_list=[]  # здесь список получателей. Например, секретарь, сам врач и т. д.
         )
 
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+EMAIL_HOST_USER = EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+//***********************
+.env
+pip install python-dotenv
+создаём в корне файл с секретной информацией, записываем значения ключей EMAIL_HOST_USER = 'jedcrb@mail.ru'
+в теле 
+load_dotenv()
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+//***********************
 
 
 СИГНАЛЫ
@@ -66,3 +81,24 @@ def notify_managers_appointment(sender, instance, created, **kwargs):
 'news.apps.NewsConfig',
 ^^          ^^^
 app         название класса в news/apps.py
+
+
+//***********************
+
+pip install django-apscheduler
+Документация https://pypi.org/project/django-apscheduler/
+
+INSTALLED_APPS = (
+    # ...
+    "django_apscheduler",
+)
+
+python manage.py migrate
+
+Создаём файл(команду) в news/management/commands/runapscheduler.py:
+из документации дёргаем его описание
+
+запускаем python .\manage.py runapscheduler
+всё работает
+
+

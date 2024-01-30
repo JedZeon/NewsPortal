@@ -2,12 +2,13 @@
 from django.contrib.auth.models import User
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 # , TemplateView
-from .models import Post, Category, UserCategory
+from .models import Post, Category, UserCategory, Author
 from .filters import PostFilter
 from .forms import PostForm
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.shortcuts import redirect
+from datetime import datetime
 
 
 class PostList(ListView):
@@ -54,6 +55,22 @@ class PostCreate(PermissionRequiredMixin, CreateView):
     model = Post
     template_name = 'post_edit.html'
     initial = {'type_news': 'NE'}
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # author_ = Author.objects.get(user=self.request.user)
+        author_ = Author.objects.filter(user=self.request.user).first()
+        self.initial.update({'author': author_})
+
+        if Post.objects.filter(author=author_, date_time__date=datetime.utcnow()).count() >= 3:
+            self.template_name = 'stop.html'
+
+        return context
+        # if request.POST:
+        #     return request.POST.get('max_posts')
+        # else:
+        #     return request.POST.get('max_posts')
 
 
 class ArticleCreate(PostCreate):
