@@ -1,13 +1,16 @@
 from django.template.loader import render_to_string
 
 from NewsPaper import settings
-from .models import Post, UserCategory, User
+from .models import Post, UserCategory
 
 from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
 from .functions import send_message_html
 
-from allauth.account.signals import email_confirmed
+from .tasks import send_email_subscribers
+
+
+# from allauth.account.signals import email_confirmed
 
 
 # Олег Афанасьев | ментор
@@ -21,14 +24,17 @@ from allauth.account.signals import email_confirmed
 # В данном случае нужно использовать сигнал m2m_changed
 
 
-# def post_save_m2m_changed(instance, action, pk, **kwargs):
-
 @receiver(signal=m2m_changed, sender=Post.categories.through)
-def post_save_m2m_changed(instance, action, **kwargs):
+def post_save_m2m_changed(instance, action):
     if action == 'post_add':
-        variant = 2
+        variant = 3
+
+        if variant == 3:
+            # Создание задачи на отправку писем для подписанных на категории
+            send_email_subscribers.delay(instance.pk)
 
         if variant == 2:
+            # Отправка писем уведомлений о новой новости в категории
             cat_user = UserCategory.objects.filter(category__in=instance.categories.all())
 
             for cat in cat_user:
@@ -47,7 +53,7 @@ def post_save_m2m_changed(instance, action, **kwargs):
         if variant == 1:
             # Перебираем все категории поста
             for post_category in instance.categories.all():
-                # перебираем пользователей подписаных на категорию
+                # перебираем пользователей подписанных на категорию
                 mail_user_send = []
                 for p_category in UserCategory.objects.filter(category=post_category):
                     if p_category.user.email:
@@ -60,17 +66,9 @@ def post_save_m2m_changed(instance, action, **kwargs):
                                 'message.html', {
                                     'post': instance,
                                     'username': p_category.user,
-                                    'link': f'{settings.SITE_URL}/news/{pk}'
+                                    'link': f'{settings.SITE_URL}/news/{instance.pk}'
                                 }
                             )
 
                             send_message_html(to=[p_category.user.email], subject=instance.title,
                                               html_message=html_content)
-                            # msg = EmailMultiAlternatives(
-                            #     subject=instance.title,
-                            #     # body=instance.text[0:50],
-                            #     from_email='jedcrb@mail.ru',
-                            #     to=[p_category.user.email]
-                            # )
-                            # msg.attach_alternative(html_content, "text/html")  # добавляем html
-                            # msg.send()  # отсылаем

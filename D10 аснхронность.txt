@@ -1,0 +1,53 @@
+pip install celery
+в директорию проекта и добавить файл celery.py рядом с settings.py
+//******************
+import os
+from celery import Celery
+ 
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mcdonalds.settings')
+ 
+app = Celery('mcdonalds')
+app.config_from_object('django.conf:settings', namespace = 'CELERY')
+
+app.autodiscover_tasks()
+//******************
+
+ в файл __init__.py (рядом с settings.py)
+//******************
+from .celery import app as celery_app
+
+__all__ = ('celery_app',)
+//******************
+
+
+REDIS - кэш брокер
+Используем хост 127.0.0.1 и порт 6379.
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+
+Скачиваем отсюда (https://github.com/microsoftarchive/redis/releases)
+архив Redis-x64-3.0.504.zip, распаковываем и запускаем от имени администратора файл redis-server.exe,
+перед тем как в проекте запустить celery.
+
+нужно настроить поддержку Redis в Python и Celery
+pip install redis
+pip install -U "celery[redis]"
+
+Запуск celery
+celery -A NewsPaper worker -l INFO --pool=solo
+
+Для запуска периодических задач на Windows запустите в разных окнах терминала:
+celery -A NewsPaper worker -l INFO --pool=solo
+и
+celery -A NewsPaper beat -l INFO
+
+
+Итоговое задание 10.5.1 (HW-03)
+Проект News Portal
+Продолжаем работать над проектом новостного приложения. В этом модуле мы, конечно же, добавим работу с асинхронными запросами. Для успешного выполнения этого итогового задания модуля вам необходимо:
+
+Установить Redis.
+Установить Celery.
+Произвести необходимые конфигурации Django для соединения всех компонентов системы.
+Реализовать рассылку уведомлений подписчикам после создания новости.
+Реализовать еженедельную рассылку с последними новостями (каждый понедельник в 8:00 утра)

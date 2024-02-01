@@ -77,8 +77,6 @@ MIDDLEWARE = [
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
 ]
 
-ROOT_URLCONF = 'NewsPaper.urls'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -166,12 +164,14 @@ ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_FORMS = {'signup': 'sign.models.SignupForm'}
 ROOT_URLCONF = "NewsPaper.urls"
 
-# Настроки сервера отправки почты
+# Настройки сервера отправки почты
 # EMAIL_HOST = 'smtp.yandex.ru'  # адрес сервера Яндекс-почты для всех один и тот же
-# EMAIL_PORT = 465  # порт smtp сервера тоже одинаковый
-# EMAIL_HOST_USER = ''  # ваше имя пользователя, например, если ваша почта user@yandex.ru, то сюда надо писать user, иными словами, это всё то что идёт до собаки
+# EMAIL_PORT = 465 # порт smtp сервера тоже одинаковый
+# EMAIL_HOST_USER = ''  # ваше имя пользователя, например, если ваша почта user@yandex.ru, то сюда надо писать user,
+# иными словами, это всё то что идёт до собаки
 # EMAIL_HOST_PASSWORD = ''  # пароль от почты
-# EMAIL_USE_SSL = True  # Яндекс использует ssl, подробнее о том, что это, почитайте в дополнительных источниках, но включать его здесь обязательно
+# EMAIL_USE_SSL = True # Яндекс использует ssl, подробнее о том, что это, почитайте в дополнительных источниках,
+# но включать его здесь обязательно
 EMAIL_HOST = 'smtp.mail.ru'
 EMAIL_PORT = 2525
 EMAIL_USE_TLS = True
@@ -183,11 +183,17 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 SITE_URL = 'http://127.0.0.1:8000'
 
-
 # ПЕРИОДИЧЕСКИЕ ЗАДАЧИ
 # пакет django-apscheduler
 
 # формат даты, которую будет воспринимать наш задачник (вспоминаем модуль по фильтрам)
 APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
-# если задача не выполняется за 25 секунд, то она автоматически снимается, можете поставить время побольше, но как правило, это сильно бьёт по производительности сервера
+# если задача не выполняется за 25 секунд, то она автоматически снимается, можете поставить время побольше,
+# но как правило, это сильно бьёт по производительности сервера
 APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds
+
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
