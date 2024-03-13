@@ -2,6 +2,10 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 load_dotenv()
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
@@ -218,11 +222,20 @@ LOGGING = {
         'simple': {
             'format': '%(asctime)s %(levelname)s %(message)s'
         },
-        'special': {
+        'simple_warning': {
             'format': '%(asctime)s %(levelname)s %(message)s %(pathname)s'
         },
-        'special_for_error': {
+        'simple_error': {
+            'format': '%(asctime)s %(levelname)s %(message)s %(exc_info)s'
+        },
+        'general': {
+            'format': '%(asctime)s %(levelname)s %(module)s %(message)s'
+        },
+        'error': {
             'format': '%(asctime)s %(levelname)s %(message)s %(pathname)s %(exc_info)s'
+        },
+        'mail_admins': {
+            'format': '%(asctime)s %(levelname)s %(message)s %(pathname)s'
         },
     },
     'filters': {
@@ -244,37 +257,70 @@ LOGGING = {
             'level': 'WARNING',
             'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
-            'formatter': 'special',
+            'formatter': 'simple_warning',
         },
         'console_error': {
             'level': 'ERROR',
             'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
-            'formatter': 'special_for_error',
+            'formatter': 'simple_error',
         },
-        # 'console2': {
-        #     'level': 'ERROR',
-        #     'filters': ['require_debug_true'],
-        #     'class': 'logging.StreamHandler',
-        #     'formatter': 'special_for_error'
-        # },
-        # 'mail_admins': {
-        #     'level': 'ERROR',
-        #     'class': 'django.utils.log.AdminEmailHandler'
-        # }
-        # 'console_general': {
-        #     'level': 'INFO',
-        #     'filters': ['require_debug_false'],
-        #     'class': 'logging.FileHandler',
-        #     'formatter': 'general',
-        #     'filename': 'general.log'
-        # },
+        'file_general': {
+            'level': 'INFO',
+            'filters': ['require_debug_false'],
+            'class': 'logging.FileHandler',
+            'formatter': 'general',
+            'filename': 'log/general.log'
+        },
+        'file_errors': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': 'log/errors.log',
+            'formatter': 'error'
+        },
+        'file_security': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'log/security.log',
+            'formatter': 'general'
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler',
+            'formatter': 'mail_admins'
+        },
     },
     'loggers': {
         'django': {
-            'handlers': ['console_debug', 'console_warning', 'console_error'],
+            'handlers': ['console_debug', 'console_warning', 'console_error', 'file_general'],
             'level': 'DEBUG',
             'propagate': True,
         },
+        'django.request': {
+            'handlers': ['file_errors', 'mail_admins'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.server': {
+            'handlers': ['file_errors', 'mail_admins'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.template': {
+            'handlers': ['file_errors', ],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'django.db.backends': {
+            'handlers': ['file_errors', ],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.security': {
+            'handlers': ['file_security', ],
+            'level': 'INFO',
+            'propagate': True,
+        }
     }
 }

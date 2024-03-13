@@ -12,9 +12,9 @@ from datetime import datetime
 
 from django.core.cache import cache  # импортируем наш кэш
 
-import logging
-
-logger = logging.getLogger(__name__)
+# import logging
+#
+# logger = logging.getLogger(__name__)
 
 
 class PostList(ListView):
@@ -36,11 +36,11 @@ class PostList(ListView):
 
     def get_context_data(self, **kwargs):
 
-        logger.debug('**** debug ****')
-        logger.info('**** info ****')
-        logger.warning('**** warning ****')
-        logger.error('**** error ****')
-        logger.critical('**** critical ****')
+        # logger.debug('**** debug ****')
+        # logger.info('**** info ****')
+        # logger.warning('**** warning ****')
+        # logger.error('**** error ****')
+        # logger.critical('**** critical ****')
 
         context = super().get_context_data(**kwargs)
         # Добавляем в контекст объект фильтрации.
