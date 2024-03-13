@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.urls import reverse
+from django.core.cache import cache
 
 sport = 'SP'
 education = 'ED'
@@ -52,6 +53,10 @@ class Category(models.Model):
     name = models.CharField(max_length=2, choices=TOPICS, default=zdrav, unique=True)
     subscribers = models.ManyToManyField(User, through='UserCategory')
 
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
+
     def __str__(self):
         return f'{self.name}'
 
@@ -70,6 +75,10 @@ class Post(models.Model):
     text = models.TextField()
     rate = models.IntegerField(default=0)
 
+    class Meta:
+        verbose_name = 'Публикация'
+        verbose_name_plural = 'Публикации'
+
     def __str__(self):
         return f'{self.date_time.strftime("%d.%m.%Y")}: {self.title.title()} - {self.text[:20]}'
 
@@ -87,6 +96,10 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         return reverse('post_detail', args=[str(self.id)])
+
+    def save(self, *args, **kwargs):
+        super(Post, self).save(*args, **kwargs)  # сначала вызываем метод родителя, чтобы объект сохранился
+        cache.delete(f'post-{self.pk}')  # затем удаляем его из кэша, чтобы сбросить его
 
 
 class PostCategory(models.Model):

@@ -7,6 +7,33 @@ from datetime import datetime, timedelta
 
 
 def send_message_html(to, subject='', message='', html_message='', test=False):
+    """Отправляет HTML письмо юзеру
+
+    Parameters
+    ----------
+    to : list[to]
+         кому отправляем ['mail@mail.ru',]
+    subject : str
+        Тема письма
+    message : str
+        обычное тело письма
+    html_message :
+        HTML присоединяемый к письму
+    test : bool
+        если True - то ничего не отправиться, а выведется сообщение
+
+    #
+    # Attributes
+    # ----------
+    #  db_name : str
+    #     database name
+    #
+    # Methods
+    # -------
+    # get(entity_name, id=None)
+    #     Gets entity by name and an optional ID.
+    #
+    """
     if not test:
         msg = EmailMultiAlternatives(
             subject=subject,
@@ -21,6 +48,7 @@ def send_message_html(to, subject='', message='', html_message='', test=False):
 
 
 def send_message_weekly(test=False):
+    """Отправить новости за неделю, всем подписанным юзверям"""
     # make_aware(value, timezone=None)[исходный код]
     # Возвращает осознанный datetime, который представляет тот же момент времени, что и value в timezone, value
     # являющийся наивным datetime.Если timezone задано None, то по умолчанию возвращается current time zone.

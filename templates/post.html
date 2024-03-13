@@ -2,31 +2,37 @@
 
 {% load custom_filters %}
 
+{% load cache %} <!-- Загружаем кэширование -->
+
 {% block title %}
-Post
+    Post
 {% endblock title %}
 
 {% block content %}
-<div class="container">
-    <div class="text-start mt-5">
-        <div>
-            <small>
-                <a class="button" href="/profile/{{post.author.user.id}}">{{ post.author }}</a>
-                : {{ post.date_time|date:'d.M.Y' }}
-                :
-                {% for category in post.categories.all %}
-                <a class="button" href="/news/?categories={{ category.id }}">{{ category }}</a>
-                {% endfor %}
-            </small>
+    <div class="container">
+        <div class="text-start mt-5">
+
+            {% cache 300 content_post %} <!-- Кэшируем отдельный блок на 300 секунд (5 мин) -->
+
+                <div>
+                    <small>
+                        <a class="button" href="/profile/{{ post.author.user.id }}">{{ post.author }}</a>
+                        : {{ post.date_time|date:'d.M.Y' }}
+                        :
+                        {% for category in post.categories.all %}
+                            <a class="button" href="/news/?categories={{ category.id }}">{{ category }}</a>
+                        {% endfor %}
+                    </small>
+                </div>
+
+                <h3>{{ post.title|censor }}</h3>
+                <p>{{ post.text|censor }}</p>
+
+                <a class="btn btn-light" href="{{ post.id }}/edit/">Изменить</a>
+                <a class="btn btn-light" href="{{ post.id }}/delete/">Удалить</a>
+                <a class="btn btn-light" href="{{ request.META.HTTP_REFERER }}">Назад</a>
+            {% endcache %}
         </div>
-
-        <h3>{{ post.title|censor }}</h3>
-        <p>{{ post.text|censor }}</p>
-
-        <a class="btn btn-light" href="{{ post.id }}/edit/">Изменить</a>
-        <a class="btn btn-light" href="{{ post.id }}/delete/">Удалить</a>
-        <a class="btn btn-light" href="{{request.META.HTTP_REFERER}}">Назад</a>
     </div>
-</div>
 
 {% endblock content %}

@@ -10,6 +10,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.shortcuts import redirect
 from datetime import datetime
 
+from django.core.cache import cache  # импортируем наш кэш
+
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class PostList(ListView):
     model = Post
@@ -29,6 +35,13 @@ class PostList(ListView):
         return self.filterset.qs
 
     def get_context_data(self, **kwargs):
+
+        logger.debug('**** debug ****')
+        logger.info('**** info ****')
+        logger.warning('**** warning ****')
+        logger.error('**** error ****')
+        logger.critical('**** critical ****')
+
         context = super().get_context_data(**kwargs)
         # Добавляем в контекст объект фильтрации.
         context['filterset'] = self.filterset
@@ -40,8 +53,21 @@ class PostDetail(DetailView):
     model = Post
     template_name = 'post.html'
     context_object_name = 'post'
+
     # Просто чтобы в urls, указать не pk а id
-    pk_url_kwarg = 'id'
+    # pk_url_kwarg = 'id'
+
+    def get_object(self, *args, **kwargs):  # переопределяем метод получения объекта
+        obj = cache.get(f'post-{self.kwargs["pk"]}', None)
+        # кэш очень похож на словарь, и метод get действует так же. Он забирает значение по ключу, если его нет,
+        # то забирает None.
+
+        # если объекта нет в кэше, то получаем его и записываем в кэш
+        if not obj:
+            obj = super().get_object(queryset=self.queryset)
+            cache.set(f'post-{self.kwargs["pk"]}', obj)
+
+        return obj
 
 
 class PostSearch(PostList):
@@ -58,19 +84,16 @@ class PostCreate(PermissionRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        # author_ = Author.objects.get(user=self.request.user)
         author_ = Author.objects.filter(user=self.request.user).first()
-        self.initial.update({'author': author_})
+        self.initial.update({**self.initial, 'author': author_, })
+
+        context['is_not_authors'] = not self.request.user.groups.filter(name='authors').exists()
+        context['author'] = author_
 
         if Post.objects.filter(author=author_, date_time__date=datetime.utcnow()).count() >= 3:
             self.template_name = 'stop.html'
 
         return context
-        # if request.POST:
-        #     return request.POST.get('max_posts')
-        # else:
-        #     return request.POST.get('max_posts')
 
 
 class ArticleCreate(PostCreate):

@@ -25,7 +25,7 @@ from .tasks import send_email_subscribers
 
 
 @receiver(signal=m2m_changed, sender=Post.categories.through)
-def post_save_m2m_changed(instance, action):
+def post_save_m2m_changed(instance, action, **kwargs):
     if action == 'post_add':
         variant = 3
 
