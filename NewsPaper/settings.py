@@ -272,7 +272,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['console_warning'],
+            'handlers': ['console_debug', 'console_warning', 'console_error'],
             'level': 'DEBUG',
             'propagate': True,
         },
